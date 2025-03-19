@@ -31,9 +31,15 @@
             "problemMatcher": []
         },
         {
-            "label": "Flash with wormhole",
+            "label": "Flash p2571_rt1061 with wormhole",
             "type": "shell",
             "command": "scp -r ./build/zephyr/zephyr.bin root@${input:ipAddress}:/tmp/nxp_flash.bin && ssh root@${input:ipAddress} 'hc_flash nxp_bin'",
+            "group": "none",
+            "problemMatcher": []
+        }, {
+            "label": "Flash p2571_power with wormhole",
+            "type": "shell",
+            "command": "scp -r ./firmwares/p2571_power.bin root@${input:ipAddress}:/tmp/power_stm_flash.bin && ssh root@${input:ipAddress} 'hc_flash power_stm'",
             "group": "none",
             "problemMatcher": []
         }
