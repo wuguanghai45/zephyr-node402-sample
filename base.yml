@@ -1,0 +1,32 @@
+# Ladder/base.yml
+manifest:
+  remotes:
+    - name: remote
+      url-base: git@ssh.dev.azure.com:v3/SimplAutomation/Zephyr
+
+  projects:
+    - name: boards
+      remote: remote
+      path: workspace/modules/boards
+      revision: 98f407770d80aa5465844f28b4378cb815caae4c
+
+    - name: canopennode
+      remote: remote
+      path: workspace/modules/canopennode
+      revision: 79b09a884398c24576e1ad9404dcc203a34a0194
+
+    - name: canopen_stack
+      remote: remote
+      path: workspace/modules/canopen_stack
+      revision: b72c4f4ca3f0b634a225e6d76908b0053c0457f1
+    - name: node402
+      remote: remote
+      path: workspace/modules/node402
+      revision: 15013393a0e546c7883c2bc201fa18e1aa522b30
+    - name: sml
+      remote: remote
+      path: workspace/modules/sml
+      revision: 642d153ecfdb6758bf834f24cc1f326b2cae2dc4
+
+
+

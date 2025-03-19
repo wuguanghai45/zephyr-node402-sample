@@ -1,0 +1,24 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build for p2201",
+            "type": "shell",
+            "command": "west build -b p2201 -p auto",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Flash with JLink",
+            "type": "shell",
+            "command": "west flash -r jlink -i $IP",
+            "group": "none",
+            "problemMatcher": []
+        }
+    ]
+} 

@@ -1,0 +1,106 @@
+/ {
+	zephyr,user {
+
+	};
+	aliases {
+		wlan0 = &esp32;
+		can1 = &flexcan1;
+	};
+
+	chosen {
+		zephyr,sram = &ocram2;
+	};
+};
+
+&flexspi {
+    status = "okay";
+    pinctrl-0 = <&pinmux_flexspi1>;
+    pinctrl-names = "default";
+    ahb-prefetch;
+    ahb-read-addr-opt;
+    rx-clock-source = <1>;
+    reg = <0x402a8000 0x4000>, <0x60000000 DT_SIZE_M(4)>;
+    is25wp032: is25wp032@0 {
+        compatible = "nxp,imx-flexspi-nor";
+        size = <DT_SIZE_M(32)>;
+        reg = <0>;
+        spi-max-frequency = <133000000>;
+        status = "okay";
+        jedec-id = [ 9d 70 17  ];
+        erase-block-size = <DT_SIZE_K(4)>;
+        write-block-size = <1>;
+
+        partitions {
+            compatible = "fixed-partitions";
+            #address-cells = <1>;
+            #size-cells = <1>;
+
+            boot_partition: partition@0 {
+                label = "mcuboot";
+                reg = <0x00000000 DT_SIZE_K(128)>;
+            };
+            slot0_partition: partition@20000 {
+                label = "image-0";
+                reg = <0x00020000 DT_SIZE_K(1440)>;
+            };
+            slot1_partition: partition@188000 {
+                label = "image-1";
+                reg = <0x00188000 DT_SIZE_K(1440)>;
+            };
+            scratch_partition: partition@2f0000 {
+                label = "image-scratch";
+                reg = <0x002f0000 DT_SIZE_K(64)>;
+            };
+            storage_partition: partition@300000 {
+                label = "storage";
+                reg = <0x00300000 DT_SIZE_K(512)>;
+            };
+			configure_partition: partition@380000 {
+                label = "configure";
+                reg = <0x00380000 DT_SIZE_K(512)>;
+            };
+        };
+    };
+};
+
+&pinmux_lpspi3 {
+        /delete-node/ group0;
+        group0 {
+                pinmux = <&iomuxc_gpio_ad_b1_12_gpio1_io28>,
+                         <&iomuxc_gpio_ad_b1_15_lpspi3_sck>,
+                         <&iomuxc_gpio_ad_b1_13_lpspi3_sdi>,
+                         <&iomuxc_gpio_ad_b1_14_lpspi3_sdo>;
+                drive-strength = "r0-6";
+                slew-rate = "slow";
+                nxp,speed = "100-mhz";
+        };
+};
+
+&pinmux_lpspi4 {
+	/delete-node/ group0;
+	group0 {
+		pinmux = <&iomuxc_gpio_b1_04_gpio2_io20>,
+		         <&iomuxc_gpio_b1_07_lpspi4_sck>,
+		         <&iomuxc_gpio_b1_05_lpspi4_sdi>,
+		         <&iomuxc_gpio_b1_06_lpspi4_sdo>;
+		drive-strength = "r0-6";
+		slew-rate = "slow";
+		nxp,speed = "100-mhz";
+	};
+};
+
+
+&lpspi3 {
+	status = "disabled";
+};
+
+
+&lpuart2 {
+	hw-flow-control;
+	status = "okay";
+	esp32: esp32 {
+		compatible = "espressif,esp-at";
+		power-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+};

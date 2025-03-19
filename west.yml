@@ -1,0 +1,10 @@
+manifest:
+  remotes:
+    - name: remote
+      url-base: git@ssh.dev.azure.com:v3/SimplAutomation/Zephyr
+
+  self:
+    west-commands: scripts/west-commands.yml
+    import:
+      - ./base.yml
+      - ../

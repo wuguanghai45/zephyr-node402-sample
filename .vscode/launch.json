@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "request": "launch",
+            "type": "cortex-debug",
+            "name": "remote J-Link p2201",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceFolder}/build/zephyr/zephyr.elf",
+            "serverpath": "/opt/JLink/JLinkGDBServerCLExe",
+            "servertype": "jlink",
+            "armToolchainPath": "/opt/zephyr-sdk/arm-zephyr-eabi/bin/",
+            "gdbPath": "/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb",
+            "objdumpPath": "/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-objdump",
+            "nmPath": "/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-nm",
+            "device": "MIMXRT1062xxx5B",
+            "interface": "swd",
+            "ipAddress": "${env:IP}",
+            "rtos": "Zephyr",
+            "showDevDebugOutput": "raw"
+        }
+    ]
+}
