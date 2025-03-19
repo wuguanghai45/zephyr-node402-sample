@@ -3,12 +3,13 @@
 
 	};
 	aliases {
-		wlan0 = &esp32;
 		can1 = &flexcan1;
 	};
 
 	chosen {
 		zephyr,sram = &ocram2;
+        zephyr,console = &lpuart1;
+        zephyr,shell-uart = &lpuart2;
 	};
 };
 
@@ -96,11 +97,5 @@
 
 
 &lpuart2 {
-	hw-flow-control;
 	status = "okay";
-	esp32: esp32 {
-		compatible = "espressif,esp-at";
-		power-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
-		status = "okay";
-	};
 };

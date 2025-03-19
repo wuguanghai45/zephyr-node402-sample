@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+
+import struct
+import os
+import sys
+
+def format(settings):
+    cursor = 0
+    
+    # 解析 num_sdos
+    num_sdos, = struct.unpack_from("<I", settings, offset=cursor)
+    lines = "  " + xxd(settings[cursor: cursor+4]) + ",\n"
+
+    cursor += 4
+    # print("0x{:02X}, 0x{:02X}, 0x{:02X}, 0x{:02X},".format(*struct.pack("<I", num_sdos)))
+    
+    # 解析每个 SDO
+    for i in range(num_sdos):
+        # 解析 index, sub_index, data_len
+        index, sub_index, data_len = struct.unpack_from("<HB I", settings, offset=cursor)
+        sdo_line = "  " + xxd(settings[cursor:cursor+7]) + ", "
+        cursor += 7
+        
+        # 解析 data
+        data = struct.unpack_from("<{}B".format(data_len), settings, offset=cursor)
+        if cursor+data_len == len(settings):
+            sdo_line = sdo_line + xxd(settings[cursor:cursor+data_len]) + "\n"
+        else:
+            sdo_line = sdo_line + xxd(settings[cursor:cursor+data_len]) + ",\n"
+        cursor += data_len
+        
+        # 打印 SDO 数据
+        #sdo_line = sdo_line + "  //index: 0x{:02X}, sub_index: 0x{:02X}, data_len: 0x{:02X}, data: ".format(index, sub_index, data_len)
+        #sdo_line = sdo_line + ", ".join("0x{:02X}".format(c) for c in data) + "\n"
+        lines = "{}{}".format(lines, sdo_line)
+
+    return lines
+
+def xxd(data):
+    # 将每个块的字节转换为十六进制和 ASCII 字符
+    hex_chars = ", ".join("0x{:02x}".format(c) for c in data)
+
+    # 将行连接成一个字符串，并返回结果
+    return hex_chars
+
+def read_file(filepath):
+    with open(filepath, "rb") as f:
+        filename = os.path.splitext(os.path.basename(filepath))[0]
+        print("正在处理文件：{}".format(filename))
+        data = f.read()
+        output_lines = format(data)
+        output_lines = "const unsigned char " + filename +  "_bin[] = {\n" + output_lines + "};\n"
+        output_lines = "{}const unsigned int {}_bin_len = {};\n\n".format(output_lines, filename, len(data))
+        print(output_lines)
+        return output_lines
+        
+
+def find_bin_files(directory):
+    bin_files = []
+    for file in os.listdir(directory):
+        if file.endswith(".bin"):
+            bin_files.append(os.path.join(directory, file))
+    #sorted_files = sorted(bin_files, key=lambda x: int(x.split('_')[1].split(".")[0], 16))
+    return bin_files
+
+if len(sys.argv) < 3:
+    print("Usage: find_bin <directory> <outputfile>")
+    sys.exit(1)
+
+directory = sys.argv[1]
+output_filename = sys.argv[2]  # 获取输出文件名
+
+bin_files = find_bin_files(directory)
+if len(bin_files) > 0:
+    print("找到以下二进制文件：")
+    lines = ""
+    for file in bin_files:
+        lines = lines + read_file(file)
+    outputfile = open(output_filename, "w")  # 使用参数指定的文件名
+    # 写入文本到文件
+    outputfile.write(lines)
+    # 关闭文件
+    outputfile.close()
+else:
+    print("未找到任何二进制文件")

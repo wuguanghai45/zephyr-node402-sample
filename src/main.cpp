@@ -41,10 +41,16 @@ int main(void)
 
     CANopenStack canopen_stack(DEVICE_DT_GET(DT_ALIAS(can1)), 1000, CAN_1);
 
-    Node402 motor = Node402{&canopen_stack, 1, &motor_settings[0], node402_event_emitter};
+    canopen_stack.init();
+    LOG_INF("CANopen stack initialized");
+
+    Node402 motor = Node402{&canopen_stack, 4, &node402_1_bin[0], node402_event_emitter};
+    LOG_INF("Creating Node402");
 
     canopen_stack.register_node(motor);
+    LOG_INF("Starting CANopen stack");
     canopen_stack.start();
+    LOG_INF("CANopen stack started");
 
     motor.init();
     motor.enable();
@@ -58,7 +64,7 @@ int main(void)
 
     uint32_t data;
     size_t read_size;
-    ret = canopen_stack.get_sdo(1, 0x1000, 0, (uint8_t *)&data, 4, &read_size);
+    ret = canopen_stack.get_sdo(4, 0x1000, 0, (uint8_t *)&data, 4, &read_size);
     if (!ret)
     {
         LOG_INF("Device type: 0x%" PRIx32, data);

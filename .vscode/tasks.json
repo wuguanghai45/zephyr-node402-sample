@@ -14,11 +14,35 @@
             ]
         },
         {
+            "label": "Generate motor_settings.h",
+            "type": "shell",
+            "command": "dcfgen design.yaml && hcxxd ./ ../src/motor_settings.h && rm ./master.dcf *.bin",
+            "group": "none",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "/zephyrproject/workspace/dcf"
+            }
+        },
+        {
             "label": "Flash with JLink",
             "type": "shell",
             "command": "west flash -r jlink -i $IP",
             "group": "none",
             "problemMatcher": []
+        },
+        {
+            "label": "Flash with wormhole",
+            "type": "shell",
+            "command": "scp -r ./build/zephyr/zephyr.bin root@${input:ipAddress}:/tmp/nxp_flash.bin && ssh root@${input:ipAddress} 'hc_flash nxp_bin'",
+            "group": "none",
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "ipAddress",
+            "type": "promptString",
+            "description": "Enter the IP address"
         }
     ]
 } 
