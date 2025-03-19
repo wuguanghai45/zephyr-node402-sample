@@ -28,7 +28,7 @@ master:
 node402_1:
   dcf: "flow_all.eds"
   # dcf_path: ""
-  node_id: 0x04
+  node_id: 1
   # revision_number: 0x12345678
   # serial_number: 0x12345678
   # heartbeat_multiplier: 3.0

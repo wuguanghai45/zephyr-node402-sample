@@ -35,6 +35,9 @@ enum CanbusDef : uint8_t
 Node402* motor;  // Use a pointer for the motor
 int target = 100000;
 
+// Define a constant for the node ID
+constexpr uint8_t NODE_ID = 1;
+
 void node402_event_emitter(Node402Event e) {
     if (e.type == NODE402_TARGET_REACHED) {
         LOG_INF("Target reached");
@@ -82,7 +85,7 @@ int main(void)
     canopen_stack.init();
 
     // Initialize the motor using a pointer
-    motor = new Node402{&canopen_stack, 4, &node402_1_bin[0], node402_event_emitter};
+    motor = new Node402{&canopen_stack, NODE_ID, &node402_1_bin[0], node402_event_emitter};
 
     canopen_stack.register_node(*motor);
     canopen_stack.start();
