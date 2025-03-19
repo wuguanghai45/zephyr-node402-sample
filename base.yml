@@ -8,7 +8,7 @@ manifest:
     - name: boards
       remote: remote
       path: workspace/modules/boards
-      revision: 98f407770d80aa5465844f28b4378cb815caae4c
+      revision: e950491d29522aff49e07cbe07527bbe40fdb6c4
 
     - name: canopennode
       remote: remote

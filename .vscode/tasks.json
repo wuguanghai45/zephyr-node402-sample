@@ -2,9 +2,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build for p2201",
+            "label": "Build for p2571_rt1061",
             "type": "shell",
-            "command": "west build -b p2201 -p auto",
+            "command": "west build -b p2571_rt1061 -p auto",
             "group": {
                 "kind": "build",
                 "isDefault": true

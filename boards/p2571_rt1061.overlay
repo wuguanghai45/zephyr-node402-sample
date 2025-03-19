@@ -1,0 +1,193 @@
+/ {
+	zephyr,user {
+
+	};
+	aliases {
+		eth0 = &enet2_mac;
+		can1 = &flexcan1;
+		can2 = &flexcan2;
+	};
+
+	chosen {
+		zephyr,shell-uart = &lpuart6;
+		zephyr,console = &lpuart1;
+		zephyr,sram = &ocram2;
+	};
+
+	soc {
+		/delete-node/ ethernet@402d4000;
+
+		enet2: enet@402d4000 {
+			compatible = "nxp,enet";
+			reg = <0x402D4000 0x628>;
+			clocks = <&ccm IMX_CCM_ENET_CLK 0 0>;
+			enet2_mac: ethernet {
+				compatible = "nxp,enet-mac";
+				interrupts = <152 0>;
+				interrupt-names = "COMMON";
+				nxp,mdio = <&enet2_mdio>;
+				nxp,ptp-clock = <&enet2_ptp_clock>;
+				phy-connection-type = "rmii";
+				status = "disabled";
+			};
+			enet2_mdio: mdio {
+				compatible = "nxp,enet-mdio";
+				status = "disabled";
+				#address-cells = <1>;
+				#size-cells = <0>;
+			};
+			enet2_ptp_clock: ptp_clock {
+				compatible = "nxp,enet-ptp-clock";
+				interrupts = <115 0>;
+				status = "disabled";
+				clocks = <&ccm IMX_CCM_ENET_PLL 0 0>;
+			};
+		};
+	};
+};
+
+&flexspi {
+    status = "okay";
+    pinctrl-0 = <&pinmux_flexspi1>;
+    pinctrl-names = "default";
+    ahb-prefetch;
+    ahb-read-addr-opt;
+    rx-clock-source = <1>;
+    reg = <0x402a8000 0x4000>, <0x60000000 DT_SIZE_M(4)>;
+    is25wp032: is25wp032@0 {
+        compatible = "nxp,imx-flexspi-nor";
+        size = <DT_SIZE_M(32)>;
+        reg = <0>;
+        spi-max-frequency = <133000000>;
+        status = "okay";
+        jedec-id = [ 9d 70 17  ];
+        erase-block-size = <DT_SIZE_K(4)>;
+        write-block-size = <1>;
+
+        partitions {
+            compatible = "fixed-partitions";
+            #address-cells = <1>;
+            #size-cells = <1>;
+
+            boot_partition: partition@0 {
+                label = "mcuboot";
+                reg = <0x00000000 DT_SIZE_K(128)>;
+            };
+            slot0_partition: partition@20000 {
+                label = "image-0";
+                reg = <0x00020000 DT_SIZE_K(1440)>;
+            };
+            slot1_partition: partition@188000 {
+                label = "image-1";
+                reg = <0x00188000 DT_SIZE_K(1440)>;
+            };
+            scratch_partition: partition@2f0000 {
+                label = "image-scratch";
+                reg = <0x002f0000 DT_SIZE_K(64)>;
+            };
+            storage_partition: partition@300000 {
+                label = "storage";
+                reg = <0x00300000 DT_SIZE_K(512)>;
+            };
+			configure_partition: partition@380000 {
+                label = "configure";
+                reg = <0x00380000 DT_SIZE_K(512)>;
+            };
+        };
+    };
+};
+
+&enet2_mac {
+	status = "okay";
+	pinctrl-0 = <&pinmux_enet2>;
+	pinctrl-names = "default";
+	phy-handle = <&phy>;
+};
+
+&enet2_mdio {
+	status = "okay";
+	pinctrl-0 = <&pinmux_enet2_mdio>;
+	pinctrl-names = "default";
+	phy: phy@0 {
+		compatible = "microchip,ksz8081";
+		reg = <0>;
+		status = "okay";
+		mc,reset-gpio = <&gpio2 2 GPIO_ACTIVE_HIGH>;
+		// mc,interrupt-gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+		mc,interface-type = "rmii";
+	};
+};
+
+&enet2_ptp_clock {
+	status = "disabled";
+	pinctrl-0 = <&pinmux_ptp>;
+	pinctrl-names = "default";
+};
+
+&pinctrl {
+	/delete-node/ pinmux_ptp;
+	/delete-node/ pinmux_enet2;
+
+	pinmux_enet2: pinmux_enet2 {
+		group0 {
+			pinmux = <&iomuxc_gpio_b0_15_enet2_ref_clk2>;
+			bias-disable;
+			drive-strength = "r0-6";
+			slew-rate = "fast";
+			nxp,speed = "50-mhz";
+			input-enable;
+		};
+		group1 {
+			pinmux = <&iomuxc_gpio_b1_01_enet2_rx_data0>,
+				<&iomuxc_gpio_b1_02_enet2_rx_data1>,
+				<&iomuxc_gpio_b1_03_enet2_rx_en>,
+				<&iomuxc_gpio_b0_12_enet2_tx_data0>,
+				<&iomuxc_gpio_b0_13_enet2_tx_data1>,
+				<&iomuxc_gpio_b0_14_enet2_tx_en>,
+				<&iomuxc_gpio_b1_00_enet2_rx_er>;
+			drive-strength = "r0-5";
+			bias-pull-up;
+			bias-pull-up-value = "100k";
+			slew-rate = "fast";
+			nxp,speed = "200-mhz";
+		};
+	};
+
+	pinmux_enet2_mdio: pinmux_enet2_mdio {
+		group0 {
+			pinmux = <&iomuxc_gpio_b0_00_enet2_mdc>,
+				<&iomuxc_gpio_b0_01_enet2_mdio>,
+				<&iomuxc_gpio_b0_02_gpio2_io02>;
+			drive-strength = "r0-5";
+			bias-pull-up;
+			bias-pull-up-value = "100k";
+			slew-rate = "fast";
+			nxp,speed = "200-mhz";
+		};
+	};
+
+	pinmux_ptp: pinmux_ptp {
+		group0 {
+			pinmux = <&iomuxc_gpio_ad_b1_10_enet2_1588_event1_out>,
+				<&iomuxc_gpio_ad_b1_11_enet2_1588_event1_in>;
+			drive-strength = "r0-6";
+			slew-rate = "slow";
+			nxp,speed = "100-mhz";
+		};
+	};
+};
+
+&lpi2c3 {
+	pinctrl-0 = <&pinmux_lpi2c3>;
+	pinctrl-names = "default";
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_FAST>;
+
+	ggpm01@35 {
+		compatible = "epson,ggpm01";
+		reg = <0x35>;
+		power-gpios = <&gpio2 28 GPIO_ACTIVE_HIGH>;
+		int-gpios = <&gpio2 30 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+};
