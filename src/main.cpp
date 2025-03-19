@@ -42,25 +42,25 @@ int main(void)
     CANopenStack canopen_stack(DEVICE_DT_GET(DT_ALIAS(can1)), 1000, CAN_1);
 
     canopen_stack.init();
-    LOG_INF("CANopen stack initialized");
 
     Node402 motor = Node402{&canopen_stack, 4, &node402_1_bin[0], node402_event_emitter};
-    LOG_INF("Creating Node402");
 
     canopen_stack.register_node(motor);
-    LOG_INF("Starting CANopen stack");
     canopen_stack.start();
-    LOG_INF("CANopen stack started");
+    canopen_stack.reset_all_node();
+    canopen_stack.operational();
 
     motor.init();
     motor.enable();
+    
 
     motor.set_profile_position_mode();
     motor.set_target_position(target);
     motor.set_profile_velocity(200000);
     motor.set_profile_acceleration(50000);
     motor.set_profile_deceleration(50000);
-    motor.start_profile_position_mode_1(false);
+    motor.start_profile_position_mode_1(true);
+    motor.start_profile_position_mode_2(true, true);
 
     uint32_t data;
     size_t read_size;
@@ -94,7 +94,8 @@ int main(void)
             LOG_INF("New target: %d", target);
 
             motor.set_target_position(target);
-            motor.start_profile_position_mode_1(false);
+            motor.start_profile_position_mode_1(true);
+            motor.start_profile_position_mode_2(true, true);
         }
         if (ret < 0)
         {
