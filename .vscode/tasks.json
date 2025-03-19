@@ -42,6 +42,12 @@
             "command": "scp -r ./firmwares/p2571_power.bin root@${input:ipAddress}:/tmp/power_stm_flash.bin && ssh root@${input:ipAddress} 'hc_flash power_stm'",
             "group": "none",
             "problemMatcher": []
+        }, {
+            "label": "Flash wormehole canable",
+            "type": "shell",
+            "command": "scp -r ./firmwares/canable.bin root@${input:ipAddress}:/tmp/stm_flash.bin && ssh root@${input:ipAddress} 'hc_flash stm'",
+            "group": "none",
+            "problemMatcher": []
         }
     ],
     "inputs": [
